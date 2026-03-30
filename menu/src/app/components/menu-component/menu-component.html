@@ -1,0 +1,355 @@
+@if (modalPdfVisible) {
+  <div
+    class="pdf-modal-backdrop"
+    role="presentation"
+    (click)="cerrarModalPdf()"
+  ></div>
+  <div
+    class="pdf-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pdf-modal-title"
+  >
+    <div class="pdf-modal__accent"></div>
+    <div class="pdf-modal__icon" aria-hidden="true">
+      @if (modalPdfError) {
+        <i class="bi bi-exclamation-circle"></i>
+      } @else {
+        <i class="bi bi-check-circle-fill"></i>
+      }
+    </div>
+    <h2 id="pdf-modal-title" class="pdf-modal__title">
+      {{ modalPdfError ? 'No se pudo generar el PDF' : 'Listo' }}
+    </h2>
+    <p class="pdf-modal__text">
+      {{
+        modalPdfError
+          ? 'Probá de nuevo en un momento. Si sigue fallando, actualizá la página.'
+          : 'El archivo se descargó. Revisá la carpeta de descargas de tu navegador.'
+      }}
+    </p>
+    <button type="button" class="pdf-modal__btn" (click)="cerrarModalPdf()">
+      Aceptar
+    </button>
+  </div>
+}
+
+<div class="menu-page py-4 py-lg-5 px-3 px-lg-5">
+  <div class="hero-panel mb-4 mb-lg-5">
+    <div class="hero-inner row g-4 align-items-center">
+      <div class="col-lg-7">
+        <p class="hero-kicker mb-2">Fundación Sí · Residencia</p>
+        <h1 class="hero-title mb-3">Menú de la semana</h1>
+        <label class="hero-dates mb-2" for="rango-semana">
+          <i class="bi bi-calendar-heart me-2" aria-hidden="true"></i>
+          <span>Rango del menú</span>
+        </label>
+        <input
+          id="rango-semana"
+          class="rango-input mb-3"
+          type="text"
+          [(ngModel)]="rangoEditable"
+          (input)="actualizarRango()"
+          placeholder="Ej: Lunes 30/03/2026 al Domingo 05/04/2026"
+        />
+        <p class="hero-note mb-0">{{ subtituloRegla }}</p>
+      </div>
+      <div
+        class="col-lg-5 text-lg-end d-flex flex-column gap-2 align-items-lg-end"
+      >
+        <button type="button" class="btn btn-rotate" (click)="rotarMenu()">
+          <i class="bi bi-shuffle me-2" aria-hidden="true"></i>
+          Rotar menú aleatorio
+        </button>
+        <button
+          type="button"
+          class="btn btn-pdf-glow"
+          (click)="exportarPDF()"
+          [disabled]="generandoPDF"
+        >
+          <i class="bi bi-file-earmark-pdf-fill me-2" aria-hidden="true"></i>
+          {{ generandoPDF ? 'Generando PDF…' : 'Descargar PDF' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section class="registro-panel mb-4" aria-labelledby="titulo-anotarse">
+    <h3 id="titulo-anotarse" class="registro-title mb-2">Anotarse</h3>
+    <p class="registro-sub mb-3">
+      Elegí el día, tu nombre y si comés esa comida. No está ligado al cuadro del
+      menú: ustedes deciden qué día corresponde según el horario de la casa.
+    </p>
+
+    <form class="mini-form" (ngSubmit)="enviarAnotacion()">
+      <div class="mini-form__row">
+        <label class="mini-form__field">
+          <span class="mini-form__label">Día</span>
+          <select
+            class="mini-form__select"
+            name="dianota"
+            [(ngModel)]="formDia"
+            (ngModelChange)="onCambioFormDia()"
+          >
+            @for (d of nombresDias; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </label>
+        <label class="mini-form__field mini-form__field--grow">
+          <span class="mini-form__label">Nombre</span>
+          <input
+            type="text"
+            class="mini-form__input"
+            name="nombreanota"
+            [(ngModel)]="formNombre"
+            placeholder="Nombre o apodo"
+            autocomplete="name"
+          />
+        </label>
+        <fieldset class="mini-form__field mini-form__come">
+          <legend class="mini-form__label">¿Comés?</legend>
+          <label class="radio-inline">
+            <input
+              type="radio"
+              name="comeanota"
+              value="si"
+              [(ngModel)]="formComeOpcion"
+            />
+            Sí come
+          </label>
+          <label class="radio-inline">
+            <input
+              type="radio"
+              name="comeanota"
+              value="no"
+              [(ngModel)]="formComeOpcion"
+            />
+            No come
+          </label>
+        </fieldset>
+        <button type="submit" class="mini-form__submit">Anotar</button>
+      </div>
+    </form>
+
+    <p class="registro-stats mb-2">
+      Total en lista: <strong>{{ totalAnotados() }}</strong>
+    </p>
+
+    <div class="pdf-dia-fila mb-3">
+      <span class="pdf-dia-fila__titulo">Imprimir solo anotados del día</span>
+      <div class="pdf-dia-fila__controls">
+        <label class="visually-hidden" for="dia-impresion">Día</label>
+        <select
+          id="dia-impresion"
+          class="pdf-dia-fila__select"
+          name="diaimpresion"
+          [(ngModel)]="diaImpresion"
+          (ngModelChange)="onCambioDiaImpresion()"
+        >
+          @for (d of nombresDias; track d) {
+            <option [value]="d">{{ d }}</option>
+          }
+        </select>
+        <button
+          type="button"
+          class="btn btn-pdf-dia"
+          (click)="exportarPdfAnotadosDelDia()"
+          [disabled]="generandoPDF"
+        >
+          <i class="bi bi-printer me-2" aria-hidden="true"></i>
+          {{ generandoPDF ? 'Generando…' : 'PDF anotados del día' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="resumen-dias">
+      @for (g of gruposPorDia(); track g.dia) {
+        @if (g.lista.length) {
+          <div class="resumen-dia">
+            <h4 class="resumen-dia__title">
+              {{ g.dia }}
+              <span class="resumen-dia__counts">
+                Comen {{ g.comen }} · No comen {{ g.noComen }}
+              </span>
+            </h4>
+            <ul class="resumen-dia__list">
+              @for (a of g.lista; track a.id) {
+                <li class="resumen-dia__item">
+                  <span class="resumen-dia__nombre">{{ a.nombre }}</span>
+                  <span
+                    class="resumen-dia__badge"
+                    [class.resumen-dia__badge--si]="a.come"
+                    [class.resumen-dia__badge--no]="!a.come"
+                  >
+                    {{ a.come ? 'Come' : 'No come' }}
+                  </span>
+                  <button
+                    type="button"
+                    class="resumen-dia__quitar"
+                    (click)="eliminarAnotacion(a.id)"
+                    aria-label="Quitar anotación"
+                  >
+                    Quitar
+                  </button>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="registro-actions">
+      <button type="button" class="btn-link-muted" (click)="vaciarListaAnotaciones()">
+        Vaciar lista actual
+      </button>
+      <button
+        type="button"
+        class="btn-link-muted"
+        (click)="historialExpandido = !historialExpandido"
+      >
+        {{ historialExpandido ? 'Ocultar historial' : 'Ver historial (este navegador)' }}
+      </button>
+      @if (historialExpandido) {
+        <div class="historial-box">
+          <p class="historial-hint mb-2">
+            Últimos registros guardados solo en este dispositivo (sin servidor).
+          </p>
+          <ul class="historial-list">
+            @for (h of historico.slice(0, 40); track h.id + h.creadoEn) {
+              <li class="historial-item">
+                <span class="historial-fecha">{{ formatoFechaHora(h.creadoEn) }}</span>
+                <span class="historial-body">
+                  <strong>{{ h.nombre }}</strong> · {{ h.dia }} ·
+                  {{ h.come ? 'Come' : 'No come' }}
+                </span>
+              </li>
+            }
+          </ul>
+          <button type="button" class="btn-link-muted mt-2" (click)="limpiarHistorial()">
+            Borrar historial
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div id="menu-export" class="menu-card">
+    <div class="menu-card-accent" aria-hidden="true"></div>
+
+    <h2 class="print-title">
+      Fundación Sí — Menú semanal ({{ rangoEditable }})
+    </h2>
+
+    <p class="rango-export">
+      <span class="rango-export__label">Vigencia del menú:</span>
+      <span class="rango-export__text">{{ rangoEditable }}</span>
+    </p>
+
+    <div class="table-scroll">
+      <table class="menu-table">
+        <thead>
+          <tr>
+            <th scope="col" class="th-corner">Turno</th>
+            <th scope="col" *ngFor="let dia of menuData.dias" class="th-dia">
+              <span class="th-dia-nombre">{{ dia.diaNombre }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="th-turno">Almuerzo</th>
+            <td *ngFor="let dia of menuData.dias">
+              <div
+                class="celda-plato"
+                [class.celda-carne-si]="dia.almuerzo.conCarne"
+                [class.celda-carne-no]="!dia.almuerzo.conCarne"
+              >
+                <span
+                  class="chip"
+                  [class.chip-carne]="dia.almuerzo.conCarne"
+                  [class.chip-veg]="!dia.almuerzo.conCarne"
+                >
+                  {{ dia.almuerzo.conCarne ? 'Carne sí' : 'Carne no' }}
+                </span>
+                <p class="plato-texto">{{ dia.almuerzo.texto }}</p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="th-turno">Cena</th>
+            <td *ngFor="let dia of menuData.dias">
+              <div
+                class="celda-plato"
+                [class.celda-carne-si]="dia.cena.conCarne"
+                [class.celda-carne-no]="!dia.cena.conCarne"
+              >
+                <span
+                  class="chip"
+                  [class.chip-carne]="dia.cena.conCarne"
+                  [class.chip-veg]="!dia.cena.conCarne"
+                >
+                  {{ dia.cena.conCarne ? 'Carne sí' : 'Carne no' }}
+                </span>
+                <p class="plato-texto">{{ dia.cena.texto }}</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <section class="pdf-anotados-block" aria-label="Anotados para el PDF">
+      <h3 class="pdf-anotados-title">Anotados por día</h3>
+      @for (g of gruposPorDia(); track g.dia) {
+        <div class="pdf-anotados-dia">
+          <p class="pdf-anotados-dia__head">
+            <strong>{{ g.dia }}</strong>
+            — Comen: {{ g.comen }} · No comen: {{ g.noComen }}
+          </p>
+          @if (g.lista.length === 0) {
+            <p class="pdf-anotados-vacio">Sin anotaciones.</p>
+          } @else {
+            <ul class="pdf-anotados-lista">
+              @for (a of g.lista; track a.id) {
+                <li>
+                  {{ a.nombre }}
+                  <span class="pdf-anotados-flag">
+                    ({{ a.come ? 'come' : 'no come' }})
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </section>
+  </div>
+
+  <div
+    id="anotados-dia-export"
+    class="anotados-dia-export--oculto"
+    aria-hidden="true"
+  >
+    <h2 class="ade-title">Fundación Sí — Anotados del día</h2>
+    <p class="ade-dia"><strong>{{ diaImpresion }}</strong></p>
+    <p class="ade-rango">Rango de menú (referencia): {{ rangoEditable }}</p>
+    <p class="ade-totales">
+      Comen: {{ totalComeDiaImpresion() }} · No comen:
+      {{ totalNoComeDiaImpresion() }}
+    </p>
+    @if (listaDiaImpresion().length === 0) {
+      <p class="ade-vacio">Sin anotaciones para este día.</p>
+    } @else {
+      <ul class="ade-lista">
+        @for (a of listaDiaImpresion(); track a.id) {
+          <li>
+            {{ a.nombre }}
+            <span class="ade-flag">({{ a.come ? 'come' : 'no come' }})</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
