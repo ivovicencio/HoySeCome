@@ -1,15 +1,6 @@
 @if (modalPdfVisible) {
-  <div
-    class="pdf-modal-backdrop"
-    role="presentation"
-    (click)="cerrarModalPdf()"
-  ></div>
-  <div
-    class="pdf-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="pdf-modal-title"
-  >
+  <div class="pdf-modal-backdrop" role="presentation" (click)="cerrarModalPdf()"></div>
+  <div class="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
     <div class="pdf-modal__accent"></div>
     <div class="pdf-modal__icon" aria-hidden="true">
       @if (modalPdfError) {
@@ -35,16 +26,16 @@
 }
 
 <div class="menu-page py-4 py-lg-5 px-3 px-lg-5">
-  <div class="hero-panel mb-4 mb-lg-5">
+  <div class="hero-panel mb-4">
     <div class="hero-inner row g-4 align-items-center">
       <div class="col-lg-7">
-        <p class="hero-kicker mb-2">Fundación Sí · Residencia</p>
-        <h1 class="hero-title mb-3">Menú de la semana</h1>
+        <p class="hero-kicker mb-2">Fundación Sí · Residencia Jujuy</p>
+        <h1 class="hero-title mb-3">Armar Menú Semanal</h1>
         
         <div class="d-flex flex-column gap-1">
           <label class="hero-dates mb-1" for="rango-semana">
             <i class="bi bi-calendar-heart me-2"></i>
-            <span>Rango del menú</span>
+            <span>Rango del menú (Vigencia)</span>
           </label>
           <input
             id="rango-semana"
@@ -55,38 +46,79 @@
             placeholder="Ej: Lunes 01 al Domingo 07"
           />
         </div>
-        
-        <p class="hero-note mb-0">{{ subtituloRegla }}</p>
+        <p class="hero-note mb-0">Hacé clic en las comidas de abajo para llenar los espacios vacíos según corresponda (Carne o Sin Carne).</p>
       </div>
 
       <div class="col-lg-5 text-lg-end d-flex flex-column gap-3 align-items-lg-end">
         <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
-          <button type="button" class="btn btn-rotate" (click)="rotarMenu()">
-            <i class="bi bi-shuffle me-2"></i>
-            Rotar menú
+          <button type="button" class="btn btn-rotate" (click)="rotarCategorias()">
+            <i class="bi bi-arrow-repeat me-2"></i>
+            Alternar Categorías
           </button>
           
+          <button type="button" class="btn btn-rotate" (click)="limpiarMenu()" style="background: #dc3545; box-shadow: 0 4px 14px rgba(220, 53, 69, 0.3);">
+            <i class="bi bi-trash me-2"></i>
+            Limpiar Todo
+          </button>
+
           <button
             type="button"
             class="btn btn-pdf-glow"
             (click)="exportarPDF()"
             [disabled]="generandoPDF"
           >
-            @if (generandoPDF) {
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-              Generando...
-            } @else {
-              <i class="bi bi-file-earmark-pdf-fill me-2"></i>
-              Descargar PDF
-            }
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+            {{ generandoPDF ? 'Generando...' : 'Descargar PDF' }}
           </button>
         </div>
       </div>
     </div>
   </div>
 
+  <div class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="p-3 bg-white rounded-4 shadow-sm border border-primary-subtle">
+        <h3 class="mini-form__label mb-3 text-primary d-flex align-items-center">
+          <i class="bi bi-egg-fried me-2"></i> Comidas con Carne
+        </h3>
+        <div class="d-flex flex-wrap gap-2">
+          @for (comida of comidasConCarne; track comida) {
+            <button 
+              type="button" 
+              class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+              (click)="seleccionarComida(comida, true)"
+              style="font-size: 0.8rem; text-align: left;"
+            >
+              {{ comida }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="p-3 bg-white rounded-4 shadow-sm border border-success-subtle">
+        <h3 class="mini-form__label mb-3 text-success d-flex align-items-center">
+          <i class="bi bi-leaf me-2"></i> Sin Carne / Legumbres
+        </h3>
+        <div class="d-flex flex-wrap gap-2">
+          @for (comida of comidasSinCarne; track comida) {
+            <button 
+              type="button" 
+              class="btn btn-sm btn-outline-success rounded-pill px-3" 
+              (click)="seleccionarComida(comida, false)"
+              style="font-size: 0.8rem; text-align: left;"
+            >
+              {{ comida }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="menu-export" class="menu-card">
-    <div class="menu-card-accent"></div>
+    <div class="menu-card-accent" aria-hidden="true"></div>
     
     <div class="menu-card-header text-center mb-4">
       <h2 class="print-title">Fundación Sí — Menú semanal</h2>
@@ -126,7 +158,7 @@
                   <span class="chip" [class.chip-carne]="dia.almuerzo.conCarne" [class.chip-veg]="!dia.almuerzo.conCarne">
                     {{ dia.almuerzo.conCarne ? 'Carne' : 'Sin Carne' }}
                   </span>
-                  <p class="plato-texto">{{ dia.almuerzo.texto }}</p>
+                  <p class="plato-texto">{{ dia.almuerzo.texto || '—' }}</p>
                 </div>
               </td>
             }
@@ -149,7 +181,7 @@
                   <span class="chip" [class.chip-carne]="dia.cena.conCarne" [class.chip-veg]="!dia.cena.conCarne">
                     {{ dia.cena.conCarne ? 'Carne' : 'Sin Carne' }}
                   </span>
-                  <p class="plato-texto">{{ dia.cena.texto }}</p>
+                  <p class="plato-texto">{{ dia.cena.texto || '—' }}</p>
                 </div>
               </td>
             }
