@@ -2,41 +2,41 @@
   <div class="pdf-modal-backdrop" (click)="cerrarModalPdf()"></div>
   <div class="pdf-modal">
     <div class="pdf-modal__accent"></div>
-    <h2 class="pdf-modal__title">¡Menú Guardado!</h2>
-    <p class="pdf-modal__text">El PDF se descargó correctamente para imprimir.</p>
+    <h2 class="pdf-modal__title">¡Listo!</h2>
+    <p class="pdf-modal__text">El PDF se descargó correctamente.</p>
     <button type="button" class="pdf-modal__btn" (click)="cerrarModalPdf()">Aceptar</button>
   </div>
 }
 
 <div class="menu-page py-4 py-lg-5 px-3 px-lg-5">
-  <div class="hero-panel mb-4">
+  <div class="hero-panel mb-4 shadow-sm">
     <div class="hero-inner row g-4 align-items-center">
       <div class="col-lg-7">
-        <h1 class="hero-title">Armado Manual de Menú</h1>
-        <p class="hero-note">Elegí los platos de la lista para completar la semana según el stock.</p>
+        <h1 class="hero-title">Armado de Menú Residencia</h1>
+        <p class="hero-note">Tocá los platos de las listas para llenar los espacios vacíos. Podés quitar platos individualmente con la (x).</p>
         <input class="rango-input" type="text" [(ngModel)]="rangoEditable" (input)="actualizarRango()" />
       </div>
       <div class="col-lg-5 text-lg-end d-flex gap-2 justify-content-lg-end flex-wrap">
-        <button type="button" class="btn btn-rotate" (click)="rotarCategorias()">
-          <i class="bi bi-arrow-repeat me-1"></i> Rotar Carne/Veg
+        <button type="button" class="btn btn-rotate btn-sm" (click)="rotarCategorias()">
+          <i class="bi bi-arrow-repeat me-1"></i> Invertir Carne/Veg
         </button>
-        <button type="button" class="btn btn-rotate btn-danger" (click)="limpiarMenu()" style="background:#dc3545;">
-          <i class="bi bi-trash me-1"></i> Limpiar
+        <button type="button" class="btn btn-rotate btn-danger btn-sm" (click)="limpiarMenu()" style="background:#dc3545;">
+          <i class="bi bi-trash me-1"></i> Vaciar Todo
         </button>
-        <button type="button" class="btn btn-pdf-glow" (click)="exportarPDF()" [disabled]="generandoPDF">
-          <i class="bi bi-download me-1"></i> PDF
+        <button type="button" class="btn btn-pdf-glow btn-sm" (click)="exportarPDF()" [disabled]="generandoPDF">
+          <i class="bi bi-download me-1"></i> Descargar PDF
         </button>
       </div>
     </div>
   </div>
 
-  <div class="row g-4 mb-5">
+  <div class="row g-3 mb-4">
     <div class="col-md-6">
       <div class="p-3 bg-white rounded-4 shadow-sm border border-primary-subtle">
-        <h3 class="mini-form__label mb-3 text-primary"><i class="bi bi-egg-fried me-2"></i>Con Carne</h3>
-        <div class="d-flex flex-wrap gap-2" style="max-height: 250px; overflow-y: auto;">
+        <h3 class="mini-form__label mb-3 text-primary fw-bold"><i class="bi bi-egg-fried me-2"></i>Con Carne</h3>
+        <div class="d-flex flex-wrap gap-2" style="max-height: 220px; overflow-y: auto; padding-right: 5px;">
           @for (comida of comidasConCarne; track comida) {
-            <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="seleccionarComida(comida, true)">
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="seleccionarComida(comida, true)" style="font-size: 0.75rem; text-align: left;">
               {{ comida }}
             </button>
           }
@@ -45,10 +45,10 @@
     </div>
     <div class="col-md-6">
       <div class="p-3 bg-white rounded-4 shadow-sm border border-success-subtle">
-        <h3 class="mini-form__label mb-3 text-success"><i class="bi bi-leaf me-2"></i>Sin Carne</h3>
-        <div class="d-flex flex-wrap gap-2" style="max-height: 250px; overflow-y: auto;">
+        <h3 class="mini-form__label mb-3 text-success fw-bold"><i class="bi bi-leaf me-2"></i>Sin Carne</h3>
+        <div class="d-flex flex-wrap gap-2" style="max-height: 220px; overflow-y: auto; padding-right: 5px;">
           @for (comida of comidasSinCarne; track comida) {
-            <button class="btn btn-sm btn-outline-success rounded-pill" (click)="seleccionarComida(comida, false)">
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" (click)="seleccionarComida(comida, false)" style="font-size: 0.75rem; text-align: left;">
               {{ comida }}
             </button>
           }
@@ -57,10 +57,12 @@
     </div>
   </div>
 
-  <div id="menu-export" class="menu-card">
+  <div id="menu-export" class="menu-card shadow-lg">
     <div class="menu-card-accent"></div>
-    <h2 class="print-title">Fundación Sí — Menú Semanal Residencia</h2>
-    <p class="text-center mb-4"><strong>Vigencia:</strong> {{ rangoEditable }}</p>
+    <div class="text-center mb-4">
+      <h2 class="print-title-visible" style="font-size: 1.5rem; color: var(--fs-morado); font-weight: 800;">Fundación Sí — Menú Semanal</h2>
+      <p class="rango-export"><strong>Vigencia:</strong> {{ rangoEditable }}</p>
+    </div>
 
     <div class="table-scroll">
       <table class="menu-table">
@@ -75,10 +77,15 @@
         <tbody>
           <tr>
             <th class="th-turno">Almuerzo</th>
-            @for (dia of menuData.dias; track dia.diaNombre) {
-              <td>
+            @for (dia of menuData.dias; let i = $index; track dia.diaNombre) {
+                <td style="position: relative;">
+                @if (dia.almuerzo.texto) {
+                  <button class="btn-quitar" (click)="quitarPlato(i, 'almuerzo')" title="Quitar plato">×</button>
+                }
                 <div class="celda-plato" [class.celda-carne-si]="dia.almuerzo.conCarne" [class.celda-carne-no]="!dia.almuerzo.conCarne">
-                  <span class="chip">{{ dia.almuerzo.conCarne ? 'Carne' : 'Sin Carne' }}</span>
+                  <span class="chip" [class.chip-carne]="dia.almuerzo.conCarne" [class.chip-veg]="!dia.almuerzo.conCarne">
+                    {{ dia.almuerzo.conCarne ? 'Carne' : 'Sin Carne' }}
+                  </span>
                   <p class="plato-texto">{{ dia.almuerzo.texto || '—' }}</p>
                 </div>
               </td>
@@ -86,10 +93,15 @@
           </tr>
           <tr>
             <th class="th-turno">Cena</th>
-            @for (dia of menuData.dias; track dia.diaNombre) {
-              <td>
+            @for (dia of menuData.dias; let i = $index; track dia.diaNombre) {
+              <td style="position: relative;">
+                @if (dia.cena.texto) {
+                  <button class="btn-quitar" (click)="quitarPlato(i, 'cena')" title="Quitar plato">×</button>
+                }
                 <div class="celda-plato" [class.celda-carne-si]="dia.cena.conCarne" [class.celda-carne-no]="!dia.cena.conCarne">
-                  <span class="chip">{{ dia.cena.conCarne ? 'Carne' : 'Sin Carne' }}</span>
+                  <span class="chip" [class.chip-carne]="dia.cena.conCarne" [class.chip-veg]="!dia.cena.conCarne">
+                    {{ dia.cena.conCarne ? 'Carne' : 'Sin Carne' }}
+                  </span>
                   <p class="plato-texto">{{ dia.cena.texto || '—' }}</p>
                 </div>
               </td>

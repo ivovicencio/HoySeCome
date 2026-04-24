@@ -14,80 +14,84 @@ import html2canvas from 'html2canvas';
 })
 export class MenuComponent implements OnInit {
   private ngZone = inject(NgZone);
-  private readonly storageKey = 'hoysecome_manual_final';
+  private readonly storageKey = 'hoysecome_manual_final_v2';
 
   menuData!: SemanaMenu;
   rangoEditable = 'Lunes 30/03/2026 al Domingo 05/04/2026';
   generandoPDF = false;
   modalPdfVisible = false;
   modalPdfError = false;
-  
   lunesEmpiezaConCarne = true;
 
   readonly nombresDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   readonly comidasConCarne = [
-    // POLLO
-    'Pollo al horno con papas o batatas + ensalada',
+    'Pollo al horno con papas y papas al horno (Pata muslo/Pechuga)',
+    'Salpicón de pollo (Pechuga, zanahoria, arvejas, tomate)',
+    'Tarta con pollo y verduras (Pechuga, zapallo, cebolla y acelga)',
+    'Guiso de arroz (Pollo o Blando)',
+    'Guiso de fideos (Pollo o Blando)',
+    'Estofado de pollo con arroz (Pata muslo)',
     'Pollo al horno con arroz',
-    'Salpicón de pollo',
-    'Guiso de arroz con pollo',
-    'Guiso de fideos con pollo',
-    'Estofado de pollo con arroz',
     'Pollo salteado con verduras y arroz',
-    'Empanadas de pollo',
-    'Tarta de pollo y verduras',
+    'Empanadas (Pollo o Carne)',
     'Sopa de pollo con verduras y fideos',
     'Picante de pollo',
     'Pollo con puré',
-    // CARNE (BIFE / BLANDO)
-    'Milanesas con arroz (Bife)',
-    'Milanesas con fideos (Bife)',
-    'Milanesas con puré (Bife)',
-    'Bife con puré',
-    'Bife encebollado con puré',
-    'Bife a la criolla',
+    'Milanesa con arroz (Blando o Bife)',
+    'Milanesa con fideos (Blando o Bife)',
+    'Milanesa con puré (Bife)',
+    'Bife a la criolla con puré (Bifes)',
+    'Bife encebollado con puré (Bifes)',
     'Marinera con ensalada rusa (Bife)',
+    'Marineras con ensalada',
     'Estofado de carne con fideos (Blando)',
     'Estofado de carne con papas (Blando)',
-    'Guiso de lentejas con carne (Blando)',
+    'Guiso de lentejas (Blando)',
     'Guiso de arroz con carne (Blando)',
     'Guiso de fideos con carne (Blando)',
     'Carne al horno con papas (Blando)',
     'Carne salteada con verduras (Blando)',
-    // CARNE MOLIDA
-    'Albóndigas con fideos (Molida)',
+    'Milanesas a la napo con arroz (Bife)',
+    'Albóndigas en salsa con fideos (Molida)',
+    'Albóndigas en salsa de tomate con fideos',
     'Albóndigas con puré (Molida)',
     'Fideos con salsa boloñesa (Molida)',
     'Arroz con salsa de carne (Molida)',
     'Pastel de papa (Molida)',
     'Pastel de carne (Molida)',
+    'Hamburguesa de carne con arroz',
     'Hamburguesas con papas o batatas (Molida)',
-    'Zapallitos rellenos (Molida)',
+    'Zapallitos rellenos con carne',
+    'Pastel de polenta',
     'Tacos de carne (Molida)',
     'Lasaña (Molida)',
     'Canelones de carne (Molida)',
     'Polenta con salsa con carne (Molida)',
-    'Empanadas de carne (Molida)',
     'Sándwich de carne picada (Molida)',
     'Burritos de carne (Molida)',
-    // OSOBUCO / OTROS
-    'Puchero con puré (Osobuco)',
+    'Croquetas de arroz (Con carne) mas ensalada',
+    'Ñoquis con salsa de carne',
+    'Puchero a la olla con puré (Osobuco)',
     'Puchero completo con verduras (Osobuco)',
     'Sopa completa con carne y verduras'
   ];
 
   readonly comidasSinCarne = [
-    'Pizza (Queso)',
-    'Tarta de verduras (Acelga/Zapallo)',
+    'Papa con queso/Bombita de papa con ensalada (Lechuga, tomate, zanahoria)',
+    'Tarta de verduras (Acelga, zapallo, cebolla)',
     'Tarta de choclo y queso',
-    'Milanesa de berenjena a la napo con arroz',
-    'Bocaditos de verduras con arroz',
-    'Hamburguesas de lentejas con verduras al horno',
-    'Hamburguesas de garbanzo',
-    'Tortilla de papa con ensalada',
-    'Tortilla de verduras (Acelga/Zapallito)',
-    'Guiso de lentejas (Sin Carne)',
+    'Pizza (Queso)',
+    'Arroz con salsa',
+    'Milanesa de berenjena a la napo con arroz (Berenjenas, tomate, queso)',
+    'Bocaditos de verduras con arroz (Zapallito o Acelga)',
+    'Polenta con salsa de tomate y queso',
+    'Hamburguesa de lentejas con verduras al horno (Papas, batata, zanahoria)',
+    'Sopa paraguaya (Queso, cebolla)',
+    'Tortilla de papas con ensalada (Huevo, lechuga, tomate)',
+    'Pastel de verduras (Queso, papa, zanahoria, berenjena, zapallito)',
+    'Fideos salteados con verduras (Zanahoria, papa, tomate, morrón y berenjena)',
+    'Sopa de zapallo',
     'Canelones de verdura',
     'Ñoquis con salsa',
     'Fideos con crema y queso',
@@ -139,7 +143,15 @@ export class MenuComponent implements OnInit {
         return;
       }
     }
-    alert('No hay más espacios libres para esta categoría.');
+  }
+
+  quitarPlato(diaIndex: number, turno: 'almuerzo' | 'cena'): void {
+    if (turno === 'almuerzo') {
+      this.menuData.dias[diaIndex].almuerzo.texto = '';
+    } else {
+      this.menuData.dias[diaIndex].cena.texto = '';
+    }
+    this.guardarEstado();
   }
 
   actualizarRango(): void {
@@ -150,13 +162,48 @@ export class MenuComponent implements OnInit {
   exportarPDF(): void {
     this.generandoPDF = true;
     const data = document.getElementById('menu-export');
-    if (!data) return;
+    if (!data) {
+      this.generandoPDF = false;
+      return;
+    }
 
-    html2canvas(data, { scale: 2 }).then((canvas) => {
+    // Guardamos dimensiones originales para restaurar después
+    const originalStyle = data.getAttribute('style') || '';
+    
+    // Forzamos el ancho de escritorio para la captura
+    data.style.width = '1200px';
+    data.style.maxWidth = 'none';
+
+    html2canvas(data, { 
+      scale: 2, 
+      windowWidth: 1200,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    }).then((canvas) => {
+      // Restauramos el estilo original
+      data.setAttribute('style', originalStyle);
+
       const pdf = new jsPDF('l', 'mm', 'a4');
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 10, 297, (canvas.height * 297) / canvas.width);
-      pdf.save(`Menu_${this.rangoEditable.replace(/ /g, '_')}.pdf`);
-      this.ngZone.run(() => { this.generandoPDF = false; this.modalPdfVisible = true; });
+      const imgWidth = 297; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Ajuste de posición vertical para centrar si la tabla es corta
+      const yPos = imgHeight < 210 ? (210 - imgHeight) / 2 : 10;
+
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, yPos, imgWidth, imgHeight);
+      pdf.save(`Menu_${this.rangoEditable.replace(/\//g, '-')}.pdf`);
+      
+      this.ngZone.run(() => { 
+        this.generandoPDF = false; 
+        this.modalPdfVisible = true; 
+      });
+    }).catch(err => {
+      console.error('Error al exportar PDF:', err);
+      data.setAttribute('style', originalStyle);
+      this.ngZone.run(() => {
+        this.generandoPDF = false;
+        this.modalPdfError = true;
+      });
     });
   }
 
@@ -173,10 +220,14 @@ export class MenuComponent implements OnInit {
   private cargarEstado(): boolean {
     const raw = localStorage.getItem(this.storageKey);
     if (!raw) return false;
-    const data = JSON.parse(raw);
-    this.rangoEditable = data.rangoEditable;
-    this.menuData = data.menuData;
-    this.lunesEmpiezaConCarne = data.lunesEmpiezaConCarne;
-    return true;
+    try {
+      const data = JSON.parse(raw);
+      this.rangoEditable = data.rangoEditable;
+      this.menuData = data.menuData;
+      this.lunesEmpiezaConCarne = data.lunesEmpiezaConCarne;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
