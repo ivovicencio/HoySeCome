@@ -1,27 +1,10 @@
 @if (modalPdfVisible) {
-  <div class="pdf-modal-backdrop" role="presentation" (click)="cerrarModalPdf()"></div>
-  <div class="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
+  <div class="pdf-modal-backdrop" (click)="cerrarModalPdf()"></div>
+  <div class="pdf-modal">
     <div class="pdf-modal__accent"></div>
-    <div class="pdf-modal__icon" aria-hidden="true">
-      @if (modalPdfError) {
-        <i class="bi bi-exclamation-circle"></i>
-      } @else {
-        <i class="bi bi-check-circle-fill"></i>
-      }
-    </div>
-    <h2 id="pdf-modal-title" class="pdf-modal__title">
-      {{ modalPdfError ? 'No se pudo generar el PDF' : 'Listo' }}
-    </h2>
-    <p class="pdf-modal__text">
-      {{
-        modalPdfError
-          ? 'Probá de nuevo en un momento. Si sigue fallando, actualizá la página.'
-          : 'El archivo se descargó. Revisá la carpeta de descargas de tu navegador.'
-      }}
-    </p>
-    <button type="button" class="pdf-modal__btn" (click)="cerrarModalPdf()">
-      Aceptar
-    </button>
+    <h2 class="pdf-modal__title">¡Menú Guardado!</h2>
+    <p class="pdf-modal__text">El PDF se descargó correctamente para imprimir.</p>
+    <button type="button" class="pdf-modal__btn" (click)="cerrarModalPdf()">Aceptar</button>
   </div>
 }
 
@@ -29,48 +12,20 @@
   <div class="hero-panel mb-4">
     <div class="hero-inner row g-4 align-items-center">
       <div class="col-lg-7">
-        <p class="hero-kicker mb-2">Fundación Sí · Residencia Jujuy</p>
-        <h1 class="hero-title mb-3">Armar Menú Semanal</h1>
-        
-        <div class="d-flex flex-column gap-1">
-          <label class="hero-dates mb-1" for="rango-semana">
-            <i class="bi bi-calendar-heart me-2"></i>
-            <span>Rango del menú (Vigencia)</span>
-          </label>
-          <input
-            id="rango-semana"
-            class="rango-input mb-3"
-            type="text"
-            [(ngModel)]="rangoEditable"
-            (input)="actualizarRango()"
-            placeholder="Ej: Lunes 01 al Domingo 07"
-          />
-        </div>
-        <p class="hero-note mb-0">Hacé clic en las comidas de abajo para llenar los espacios vacíos según corresponda (Carne o Sin Carne).</p>
+        <h1 class="hero-title">Armado Manual de Menú</h1>
+        <p class="hero-note">Elegí los platos de la lista para completar la semana según el stock.</p>
+        <input class="rango-input" type="text" [(ngModel)]="rangoEditable" (input)="actualizarRango()" />
       </div>
-
-      <div class="col-lg-5 text-lg-end d-flex flex-column gap-3 align-items-lg-end">
-        <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
-          <button type="button" class="btn btn-rotate" (click)="rotarCategorias()">
-            <i class="bi bi-arrow-repeat me-2"></i>
-            Alternar Categorías
-          </button>
-          
-          <button type="button" class="btn btn-rotate" (click)="limpiarMenu()" style="background: #dc3545; box-shadow: 0 4px 14px rgba(220, 53, 69, 0.3);">
-            <i class="bi bi-trash me-2"></i>
-            Limpiar Todo
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-pdf-glow"
-            (click)="exportarPDF()"
-            [disabled]="generandoPDF"
-          >
-            <i class="bi bi-file-earmark-pdf-fill me-2"></i>
-            {{ generandoPDF ? 'Generando...' : 'Descargar PDF' }}
-          </button>
-        </div>
+      <div class="col-lg-5 text-lg-end d-flex gap-2 justify-content-lg-end flex-wrap">
+        <button type="button" class="btn btn-rotate" (click)="rotarCategorias()">
+          <i class="bi bi-arrow-repeat me-1"></i> Rotar Carne/Veg
+        </button>
+        <button type="button" class="btn btn-rotate btn-danger" (click)="limpiarMenu()" style="background:#dc3545;">
+          <i class="bi bi-trash me-1"></i> Limpiar
+        </button>
+        <button type="button" class="btn btn-pdf-glow" (click)="exportarPDF()" [disabled]="generandoPDF">
+          <i class="bi bi-download me-1"></i> PDF
+        </button>
       </div>
     </div>
   </div>
@@ -78,37 +33,22 @@
   <div class="row g-4 mb-5">
     <div class="col-md-6">
       <div class="p-3 bg-white rounded-4 shadow-sm border border-primary-subtle">
-        <h3 class="mini-form__label mb-3 text-primary d-flex align-items-center">
-          <i class="bi bi-egg-fried me-2"></i> Comidas con Carne
-        </h3>
-        <div class="d-flex flex-wrap gap-2">
+        <h3 class="mini-form__label mb-3 text-primary"><i class="bi bi-egg-fried me-2"></i>Con Carne</h3>
+        <div class="d-flex flex-wrap gap-2" style="max-height: 250px; overflow-y: auto;">
           @for (comida of comidasConCarne; track comida) {
-            <button 
-              type="button" 
-              class="btn btn-sm btn-outline-primary rounded-pill px-3" 
-              (click)="seleccionarComida(comida, true)"
-              style="font-size: 0.8rem; text-align: left;"
-            >
+            <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="seleccionarComida(comida, true)">
               {{ comida }}
             </button>
           }
         </div>
       </div>
     </div>
-
     <div class="col-md-6">
       <div class="p-3 bg-white rounded-4 shadow-sm border border-success-subtle">
-        <h3 class="mini-form__label mb-3 text-success d-flex align-items-center">
-          <i class="bi bi-leaf me-2"></i> Sin Carne / Legumbres
-        </h3>
-        <div class="d-flex flex-wrap gap-2">
+        <h3 class="mini-form__label mb-3 text-success"><i class="bi bi-leaf me-2"></i>Sin Carne</h3>
+        <div class="d-flex flex-wrap gap-2" style="max-height: 250px; overflow-y: auto;">
           @for (comida of comidasSinCarne; track comida) {
-            <button 
-              type="button" 
-              class="btn btn-sm btn-outline-success rounded-pill px-3" 
-              (click)="seleccionarComida(comida, false)"
-              style="font-size: 0.8rem; text-align: left;"
-            >
+            <button class="btn btn-sm btn-outline-success rounded-pill" (click)="seleccionarComida(comida, false)">
               {{ comida }}
             </button>
           }
@@ -118,69 +58,38 @@
   </div>
 
   <div id="menu-export" class="menu-card">
-    <div class="menu-card-accent" aria-hidden="true"></div>
-    
-    <div class="menu-card-header text-center mb-4">
-      <h2 class="print-title">Fundación Sí — Menú semanal</h2>
-      <div class="rango-export d-inline-block">
-        <span class="rango-export__label">Vigencia:</span>
-        <span class="rango-export__text">{{ rangoEditable }}</span>
-      </div>
-    </div>
+    <div class="menu-card-accent"></div>
+    <h2 class="print-title">Fundación Sí — Menú Semanal Residencia</h2>
+    <p class="text-center mb-4"><strong>Vigencia:</strong> {{ rangoEditable }}</p>
 
     <div class="table-scroll">
       <table class="menu-table">
         <thead>
           <tr>
-            <th scope="col" class="th-corner">Turno</th>
+            <th class="th-corner">Turno</th>
             @for (dia of menuData.dias; track dia.diaNombre) {
-              <th scope="col" class="th-dia">
-                <span class="th-dia-nombre">{{ dia.diaNombre }}</span>
-              </th>
+              <th class="th-dia">{{ dia.diaNombre }}</th>
             }
           </tr>
         </thead>
         <tbody>
           <tr>
-            <th scope="row" class="th-turno">
-              <div class="turno-wrapper">
-                <i class="bi bi-sun-fill mb-1"></i>
-                <span>Almuerzo</span>
-              </div>
-            </th>
+            <th class="th-turno">Almuerzo</th>
             @for (dia of menuData.dias; track dia.diaNombre) {
               <td>
-                <div 
-                  class="celda-plato" 
-                  [class.celda-carne-si]="dia.almuerzo.conCarne" 
-                  [class.celda-carne-no]="!dia.almuerzo.conCarne"
-                >
-                  <span class="chip" [class.chip-carne]="dia.almuerzo.conCarne" [class.chip-veg]="!dia.almuerzo.conCarne">
-                    {{ dia.almuerzo.conCarne ? 'Carne' : 'Sin Carne' }}
-                  </span>
+                <div class="celda-plato" [class.celda-carne-si]="dia.almuerzo.conCarne" [class.celda-carne-no]="!dia.almuerzo.conCarne">
+                  <span class="chip">{{ dia.almuerzo.conCarne ? 'Carne' : 'Sin Carne' }}</span>
                   <p class="plato-texto">{{ dia.almuerzo.texto || '—' }}</p>
                 </div>
               </td>
             }
           </tr>
-          
           <tr>
-            <th scope="row" class="th-turno">
-              <div class="turno-wrapper">
-                <i class="bi bi-moon-stars-fill mb-1"></i>
-                <span>Cena</span>
-              </div>
-            </th>
+            <th class="th-turno">Cena</th>
             @for (dia of menuData.dias; track dia.diaNombre) {
               <td>
-                <div 
-                  class="celda-plato" 
-                  [class.celda-carne-si]="dia.cena.conCarne" 
-                  [class.celda-carne-no]="!dia.cena.conCarne"
-                >
-                  <span class="chip" [class.chip-carne]="dia.cena.conCarne" [class.chip-veg]="!dia.cena.conCarne">
-                    {{ dia.cena.conCarne ? 'Carne' : 'Sin Carne' }}
-                  </span>
+                <div class="celda-plato" [class.celda-carne-si]="dia.cena.conCarne" [class.celda-carne-no]="!dia.cena.conCarne">
+                  <span class="chip">{{ dia.cena.conCarne ? 'Carne' : 'Sin Carne' }}</span>
                   <p class="plato-texto">{{ dia.cena.texto || '—' }}</p>
                 </div>
               </td>
@@ -188,10 +97,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <div class="menu-footer-print mt-4 text-center">
-      <p class="mb-0">Residencia Universitaria Jujuy — Fundación Sí</p>
     </div>
   </div>
 </div>
