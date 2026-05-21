@@ -631,6 +631,91 @@
   gap: 0.35rem;
 }
 
+/* ─── DRAG & DROP ──────────────────────────────────────── */
+
+.drop-cell {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.drop-valid {
+  background-color: rgba(25, 135, 84, 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(25, 135, 84, 0.35) !important;
+}
+
+.drop-invalid {
+  background-color: rgba(220, 53, 69, 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(220, 53, 69, 0.35) !important;
+}
+
+.draggable-btn {
+  cursor: grab;
+  user-select: none;
+  position: relative;
+}
+
+.draggable-btn:active {
+  cursor: grabbing;
+}
+
+.draggable-btn[draggable="true"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ─── INGREDIENTES TOOLTIP ────────────────────────────── */
+
+.ingredientes-tooltip {
+  position: absolute;
+  z-index: 1060;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  background: #1f1528;
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: tooltip-in 0.15s ease-out;
+}
+
+.ingredientes-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f1528;
+}
+
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.ingredientes-mini {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--fs-muted);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ─── CUSTOM FORM ─────────────────────────────────────── */
+
+.custom-form-panel {
+  background: #fff;
+  border: 1px solid rgba(107, 51, 138, 0.2);
+}
+
 .btn-link-muted {
   border: none;
   background: none;

@@ -26,10 +26,10 @@ export class MenuComponent implements OnInit {
   readonly nombresDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   readonly comidasConCarne = [
-    'Pollo al horno con papas y papas al horno (Pata muslo/Pechuga)',
-    'Salpicón de pollo (Pechuga, zanahoria, arvejas, tomate)',
+    'Pollo al horno con papas y batatas al horno (Pata muslo/Pechuga)',
+    'Salpicón de pollo (Pechuga, zanahoria, arvejas, tomate) con arroz',
     'Tarta con pollo y verduras (Pechuga, zapallo, cebolla y acelga)',
-    'Guiso de arroz (Pollo o Blando)',
+    'Guiso de arroz (Pollo o Blando )',
     'Guiso de fideos (Pollo o Blando)',
     'Estofado de pollo con arroz (Pata muslo)',
     'Pollo al horno con arroz',
@@ -44,9 +44,9 @@ export class MenuComponent implements OnInit {
     'Bife a la criolla con puré (Bifes)',
     'Bife encebollado con puré (Bifes)',
     'Marinera con ensalada rusa (Bife)',
-    'Marineras con ensalada',
-    'Estofado de carne con fideos (Blando)',
-    'Estofado de carne con papas (Blando)',
+    'Marineras con fideos a la provenzal (ajo y perejil) (Bife)',
+    'Estofado de carne con fideos (Blando) (papas, zapallo, zanahoria, cebolla salteada)',
+    'Estofado de carne con papas (Blando) (papas, zapallo, zanahoria, cebolla salteada)',
     'Guiso de lentejas (Blando)',
     'Guiso de arroz con carne (Blando)',
     'Guiso de fideos con carne (Blando)',
@@ -65,8 +65,8 @@ export class MenuComponent implements OnInit {
     'Zapallitos rellenos con carne',
     'Pastel de polenta',
     'Tacos de carne (Molida)',
-    'Lasaña (Molida)',
-    'Canelones de carne (Molida)',
+    'Lasaña (Molida) (masa de panqueques en capas)',
+    'Canelones de carne con salsa roja (Molida) y blanca (salsa blanca con queso)',
     'Polenta con salsa con carne (Molida)',
     'Sándwich de carne picada (Molida)',
     'Burritos de carne (Molida)',
@@ -97,7 +97,7 @@ export class MenuComponent implements OnInit {
     'Fideos con crema y queso',
     'Arroz con verduras salteadas',
     'Arroz con salsa y queso',
-    'Papas rellenas'
+    'Bombitas de papa con queso y arroz'
   ];
 
   ngOnInit(): void {

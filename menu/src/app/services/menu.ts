@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 export interface ComidaTurno {
   texto: string;
   conCarne: boolean;
+  comidaId?: string;
 }
 
 export interface PlatoDia {
@@ -17,6 +18,18 @@ export interface SemanaMenu {
   fechaInicio: string;
   fechaFin: string;
   dias: PlatoDia[];
+}
+
+export interface Ingrediente {
+  nombre: string;
+  cantidad: string;
+}
+
+export interface ComidaDef {
+  id: string;
+  nombre: string;
+  conCarne: boolean;
+  ingredientes: Ingrediente[];
 }
 
 type DiaPlantilla = {
